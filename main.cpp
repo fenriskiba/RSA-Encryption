@@ -4,7 +4,7 @@
 
 using namespace std;
 
-BigInt randomPrime(int size); //Generates a prime number with 'size' digits
+BigInt randomPrime(BigInt size); //Generates a prime number with 'size' digits
 BigInt* euclideanAlgorithm(BigInt a, BigInt b); //Outputs a 2 element array with elements (x,y) such that gcd(a,b) = ax+by and y>0
 BigInt* modInverse(BigInt e, BigInt p, BigInt q); //Outputs a 2 element array with elements (d,n) such that ed=1%(p-1)(q-1), n=pq
 string rsaEncrypt(BigInt e, BigInt n, string message); //Outputs the RSA Encrypted message
@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     }
     else if(argc == 2)
     {
-        int size = atoi(argv[1]);
+        BigInt size = atoi(argv[1]);
         cout << "Size of your prime number: " << size << endl;
         cout << "Your prime number is: " << randomPrime(size) << endl;
     }
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-BigInt randomPrime(int size)
+BigInt randomPrime(BigInt size)
 {
 	return 42;
 }
