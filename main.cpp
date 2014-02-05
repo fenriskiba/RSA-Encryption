@@ -10,6 +10,9 @@ BigInt* modInverse(BigInt e, BigInt p, BigInt q); //Outputs a 2 element array wi
 string rsaEncrypt(BigInt e, BigInt n, string message); //Outputs the RSA Encrypted message
 string rsaDecrypt(BigInt d, BigInt n, string eMessage); //Decrypts and outputs the encrypted message
 
+BigInt generateRandom(BigInt size); //Generates a random number of the given size
+BigInt bigPow(BigInt a, BigInt b); //Calculates a^b
+
 int main(int argc, char *argv[])
 {
     if(argc == 1 || argc > 5)
@@ -67,7 +70,50 @@ int main(int argc, char *argv[])
 
 BigInt randomPrime(BigInt size)
 {
-	return 42;
+	BigInt possiblePrime = generateRandom(size);
+
+	return possiblePrime;
+}
+
+BigInt generateRandom(BigInt size)
+{
+    srand(time(0));
+    BigInt result = 0;
+    BigInt digit;
+    
+    for(BigInt i = 0; i < size - 1; i = i + 1)
+    {
+        digit = rand();
+        result = result + (digit % 10) * bigPow(10, i);
+    }
+    
+    digit = rand();
+    
+    result = result + ((digit % 9) + 1) * bigPow(10, size - 1);
+    
+    return result;
+}
+
+BigInt bigPow(BigInt base, BigInt exponent)
+{
+    if (exponent == 0) 
+    {
+        return 1;
+    }
+    else if (exponent == 1)
+    {
+        return base;
+    }
+    else if (exponent % 2 == 0)
+    {
+        BigInt t = bigPow(base, exponent / 2);
+        return t * t;
+    }
+    else
+    {
+        BigInt t = bigPow(base, exponent / 2);
+        return t * t * base;
+    }
 }
 
 BigInt* euclideanAlgorithm(BigInt a, BigInt b)
