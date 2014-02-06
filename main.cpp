@@ -12,12 +12,16 @@ string rsaDecrypt(BigInt d, BigInt n, string eMessage); //Decrypts and outputs t
 
 BigInt generateRandom(BigInt size); //Generates a random number of the given size
 BigInt bigPow(BigInt a, BigInt b); //Calculates a^b
+BigInt modularExponentiation(BigInt base, BigInt exp, BigInt mod); //Calculates a^b mod x
+bool fermatsLittleTheorem(BigInt possiblePrime);
 
 int main(int argc, char *argv[])
 {
+    srand(time(0));
+    
     if(argc == 1 || argc > 5)
     {
-        cout << "Wrong input format!" << 0;
+        cout << "Wrong input format!" << endl;
     }
     else if(argc == 2)
     {
@@ -71,13 +75,15 @@ int main(int argc, char *argv[])
 BigInt randomPrime(BigInt size)
 {
 	BigInt possiblePrime = generateRandom(size);
+    
+    while(!fermatsLittleTheorem(possiblePrime))
+        possiblePrime = generateRandom(size);
 
 	return possiblePrime;
 }
 
 BigInt generateRandom(BigInt size)
 {
-    srand(time(0));
     BigInt result = 0;
     BigInt digit;
     
@@ -114,6 +120,44 @@ BigInt bigPow(BigInt base, BigInt exponent)
         BigInt t = bigPow(base, exponent / 2);
         return t * t * base;
     }
+}
+
+BigInt modularExponentiation(BigInt base, BigInt exp, BigInt mod)
+{
+    if(exp == 0)
+    {
+        return 1;
+    }
+    else
+    {
+        BigInt z = modularExponentiation(base, exp / 2, mod);
+        
+        if((exp % 2) == 0)
+        {
+            return (z * z % mod);
+        }
+        else
+        {
+            return (base * z * z % mod);
+        }
+    }
+}
+
+bool fermatsLittleTheorem(BigInt possiblePrime)
+{
+    BigInt random;
+    int a = 2; //Increase this number to improve reliability
+    
+    for(int i = 0; i < a; i++)
+    {
+        random = rand();
+        random = random % (possiblePrime - 1) + 1;
+        random = modularExponentiation(random, possiblePrime - 1, possiblePrime);
+        if(random != 1)
+            return false;
+    }
+    
+    return true;
 }
 
 BigInt* euclideanAlgorithm(BigInt a, BigInt b)
