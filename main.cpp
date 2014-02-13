@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
         BigInt b = atoi(argv[2]);
         cout << "a = " << a << ", b = " << b << endl;
         BigInt* euclidean = euclideanAlgorithm(a,b);
-        cout << "x = " << euclidean[0] << ", y = " << euclidean[1] << endl;
+        cout << "x = " << euclidean[1] << ", y = " << euclidean[2] << endl;
         delete [] euclidean;
     }
     else if(argc == 4)
@@ -162,10 +162,26 @@ bool fermatsLittleTheorem(BigInt possiblePrime)
 
 BigInt* euclideanAlgorithm(BigInt a, BigInt b)
 {
-	BigInt* test = new BigInt[2];
-	test[0] = 42;
-	test[1] = 42;
-	return test;
+    BigInt* result = new BigInt[3];
+    BigInt* resultPrime;
+    
+    if(b == 0)
+    {
+        result[0] = a;
+        result[1] = 1;
+        result[2] = 0;
+        return result;
+    }
+    
+    resultPrime = euclideanAlgorithm(b, a % b);
+    
+    result[0] = resultPrime[0];
+    result[1] = resultPrime[2];
+    result[2] = resultPrime[1] - ((a / b) * resultPrime[2]);
+    
+    delete [] resultPrime;
+    
+    return result;
 }
 
 BigInt* modInverse(BigInt e, BigInt p, BigInt q)
