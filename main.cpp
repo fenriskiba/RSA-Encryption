@@ -20,6 +20,7 @@ bool fermatsLittleTheorem(BigInt possiblePrime);
 string* stringToAscii(string message); //Converts a string to an array of numbers representing the ascii values
 string* asciiBlocks(string* asciiMessage, int& length);
 BigInt* asciiToDecimal(string* asciiMessage, int length);
+string decToBin(BigInt number);
 
 int main(int argc, char *argv[])
 {
@@ -219,7 +220,7 @@ void rsaEncrypt(BigInt e, BigInt n, string message)
     
     for(int i = 0; i < numOfBlocks; i++)
     {
-        cout << (bigPow(toBeEncrypted[i], e) % n) << " ";
+        cout << modularExponentiation(toBeEncrypted[i], e, n) << " ";
     }
 }
 
@@ -274,8 +275,63 @@ BigInt* asciiToDecimal(string* binary, int length)
     return result;
 }
 
+string decToBin(BigInt number)
+{
+    if(number == 0) 
+        return "0";
+    if(number == 1)
+        return "1";
+
+    if(number % 2 == 0)
+        return decToBin(number / 2) + "0";
+    else
+        return decToBin(number / 2) + "1";
+}
+
 string rsaDecrypt(BigInt d, BigInt n, string eMessage)
 {
-    return "testing123";
+    stringstream toBeSeparated(eMessage);
+    string word;
+    string* separated = new string[0];
+    int count = 0;
+    
+    while(getline(toBeSeparated, word, ' '))
+    {
+        count++;
+        string* temp = new string[count];
+        
+        for(int i = 0; i < count-1; i++)
+        {
+            temp[i] = separated[i];
+        }
+        delete [] separated;
+        temp[count - 1] = word;
+        separated = temp;
+    }
+    
+    BigInt* decrypted = new BigInt[count];
+    for(int i = 0; i < count; i++)
+    {
+        decrypted[i] = separated[i];
+        decrypted[i] = modularExponentiation(decrypted[i], d, n);
+    }
+    delete [] separated;
+    
+    string* ascii = new string[count];
+    for(int i = 0; i < count; i++)
+    {
+        ascii[i] = decToBin(decrypted[i]);
+        if(ascii[i].length() < 16)
+        {   
+            string temp = "";
+            for(int x = 0; x < (16 - ascii[i].length()); x++)
+                temp += "0";
+            ascii[i] = temp + ascii[i];
+        }
+    }
+    
+    //convert ASCII to string
+    
+    return "meh";
 }
 
