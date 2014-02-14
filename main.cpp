@@ -5,7 +5,7 @@
 using namespace std;
 
 BigInt randomPrime(BigInt size); //Generates a prime number with 'size' digits
-BigInt* euclideanAlgorithm(BigInt a, BigInt b); //Outputs a 2 element array with elements (x,y) such that gcd(a,b) = ax+by and y>0
+BigInt* euclideanAlgorithm(BigInt a, BigInt b); //Outputs a 3 element array with elements (d,x,y) such that gcd(a,b) = ax+by and y>0
 BigInt* modInverse(BigInt e, BigInt p, BigInt q); //Outputs a 2 element array with elements (d,n) such that ed=1%(p-1)(q-1), n=pq
 string rsaEncrypt(BigInt e, BigInt n, string message); //Outputs the RSA Encrypted message
 string rsaDecrypt(BigInt d, BigInt n, string eMessage); //Decrypts and outputs the encrypted message
@@ -186,10 +186,16 @@ BigInt* euclideanAlgorithm(BigInt a, BigInt b)
 
 BigInt* modInverse(BigInt e, BigInt p, BigInt q)
 {
-    BigInt* test = new BigInt[2];
-	test[0] = 42;
-	test[1] = 42;
-	return test;
+    BigInt n = p * q;
+    BigInt m = (p - 1) * (q - 1);
+    BigInt* dTemp = euclideanAlgorithm(e,m);
+    BigInt d = (dTemp[1] + m) % m;
+    
+    BigInt* result = new BigInt[2];
+    result[0] = d;
+    result[1] = n;
+    
+    return result;
 }
 
 string rsaEncrypt(BigInt e, BigInt n, string message)
