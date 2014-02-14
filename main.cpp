@@ -10,7 +10,7 @@ using namespace std;
 BigInt randomPrime(BigInt size); //Generates a prime number with 'size' digits
 BigInt* euclideanAlgorithm(BigInt a, BigInt b); //Outputs a 3 element array with elements (d,x,y) such that gcd(a,b) = ax+by and y>0
 BigInt* modInverse(BigInt e, BigInt p, BigInt q); //Outputs a 2 element array with elements (d,n) such that ed=1%(p-1)(q-1), n=pq
-string rsaEncrypt(BigInt e, BigInt n, string message); //Outputs the RSA Encrypted message
+void rsaEncrypt(BigInt e, BigInt n, string message); //Outputs the RSA Encrypted message
 string rsaDecrypt(BigInt d, BigInt n, string eMessage); //Decrypts and outputs the encrypted message
 
 BigInt generateRandom(BigInt size); //Generates a random number of the given size
@@ -61,8 +61,9 @@ int main(int argc, char *argv[])
             BigInt n = atoi(argv[3]);
             string message = argv[4];
             cout << "e = " << e << ", n = " << n <<", message = \""<< message << "\"" << endl;
-            string encrypted = rsaEncrypt(e, n, message);
-            cout << "The encrypted message is: " << encrypted << endl;
+            cout << "The encrypted message is: ";
+            rsaEncrypt(e, n, message);
+            cout << endl;
         }
         else if(argv[1][0]=='d')
         {
@@ -204,19 +205,22 @@ BigInt* modInverse(BigInt e, BigInt p, BigInt q)
     return result;
 }
 
-string rsaEncrypt(BigInt e, BigInt n, string message)
+void rsaEncrypt(BigInt e, BigInt n, string message)
 {
     string* asciiMessage = stringToAscii(message);
-    
     int numOfBlocks = message.length();
+    
     string* combinedBlocks = asciiBlocks(asciiMessage, numOfBlocks);
-    
     delete [] asciiMessage;
-    BigInt* toBeEncrypted = asciiToDecimal(combinedBlocks, numOfBlocks);
     
+    BigInt* toBeEncrypted = asciiToDecimal(combinedBlocks, numOfBlocks);
     delete [] combinedBlocks;
     
-    return "meh";
+    
+    for(int i = 0; i < numOfBlocks; i++)
+    {
+        cout << (bigPow(toBeEncrypted[i], e) % n) << " ";
+    }
 }
 
 string* stringToAscii(string message)
