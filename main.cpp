@@ -1,5 +1,8 @@
 #include <iostream>
 #include <cmath>
+#include <bitset>
+#include <string>
+#include <sstream>
 #include "BigInt.h"
 
 using namespace std;
@@ -14,6 +17,7 @@ BigInt generateRandom(BigInt size); //Generates a random number of the given siz
 BigInt bigPow(BigInt a, BigInt b); //Calculates a^b
 BigInt modularExponentiation(BigInt base, BigInt exp, BigInt mod); //Calculates a^b mod x
 bool fermatsLittleTheorem(BigInt possiblePrime);
+string* stringToAscii(string message); //Converts a string to an array of numbers representing the ascii values
 
 int main(int argc, char *argv[])
 {
@@ -200,10 +204,29 @@ BigInt* modInverse(BigInt e, BigInt p, BigInt q)
 
 string rsaEncrypt(BigInt e, BigInt n, string message)
 {
-    return "321gnitset";
+    string* asciiMessage = stringToAscii(message);
+    
+    
+    
+    return "meh";
+}
+
+string* stringToAscii(string message)
+{
+    string* result = new string[message.length()];
+    
+    for(int i = 0; i < message.length(); i++)
+    {
+        stringstream temp;
+        temp << bitset<8>(message.c_str()[i]);
+        temp >> result[i];
+    }
+    
+    return result;
 }
 
 string rsaDecrypt(BigInt d, BigInt n, string eMessage)
 {
     return "testing123";
 }
+
