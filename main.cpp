@@ -18,6 +18,8 @@ BigInt bigPow(BigInt a, BigInt b); //Calculates a^b
 BigInt modularExponentiation(BigInt base, BigInt exp, BigInt mod); //Calculates a^b mod x
 bool fermatsLittleTheorem(BigInt possiblePrime);
 string* stringToAscii(string message); //Converts a string to an array of numbers representing the ascii values
+string* asciiBlocks(string* asciiMessage, int& length);
+BigInt* asciiToDecimal(string* asciiMessage, int length);
 
 int main(int argc, char *argv[])
 {
@@ -206,7 +208,13 @@ string rsaEncrypt(BigInt e, BigInt n, string message)
 {
     string* asciiMessage = stringToAscii(message);
     
+    int numOfBlocks = message.length();
+    string* combinedBlocks = asciiBlocks(asciiMessage, numOfBlocks);
     
+    delete [] asciiMessage;
+    BigInt* toBeEncrypted = asciiToDecimal(combinedBlocks, numOfBlocks);
+    
+    delete [] combinedBlocks;
     
     return "meh";
 }
@@ -220,6 +228,43 @@ string* stringToAscii(string message)
         stringstream temp;
         temp << bitset<8>(message.c_str()[i]);
         temp >> result[i];
+    }
+    
+    return result;
+}
+
+string* asciiBlocks(string* asciiMessage, int& length)
+{
+    bool isEven = length % 2 ? false : true;
+    int newLength = (isEven ? length / 2 : (length / 2) + 1);
+    string* result = new string[newLength];
+    int asciiIndex = 0;
+    
+    for(int i = 0; i < (length / 2); i++)
+    {
+        result[i] = asciiMessage[asciiIndex] + asciiMessage[asciiIndex + 1];
+        asciiIndex += 2;
+    }
+    
+    if(!isEven)
+    {
+        result[newLength - 1] = "00000000" + asciiMessage[length - 1];
+    }
+    
+    length = newLength;
+        
+    return result;
+}
+
+BigInt* asciiToDecimal(string* binary, int length)
+{
+    unsigned long decimal = 0;
+    BigInt* result = new BigInt[length];
+    
+    for(int i = 0; i < length; i++)
+    {
+        decimal = bitset<32>(binary[i]).to_ulong();
+        result[i] = (int) decimal;
     }
     
     return result;
