@@ -295,20 +295,25 @@ void rsaDecrypt(BigInt d, BigInt n, string eMessage)
     string word;
     string* separated = new string[0];
     int count = 0;
+    string* old;
     
     while(getline(toBeSeparated, word, ' '))
     {
         count++;
-        string* temp = new string[count];
+        old = separated;
+        
+        separated = new string[count];
         
         for(int i = 0; i < count-1; i++)
         {
-            temp[i] = separated[i];
+            separated[i] = old[i];
         }
-        delete [] separated;
-        temp[count - 1] = word;
-        separated = temp;
+        if(count != 1)
+            delete [] old;
+        
+        separated[count-1] = word;
     }
+    
     
     BigInt* decrypted = new BigInt[count];
     for(int i = 0; i < count; i++)
