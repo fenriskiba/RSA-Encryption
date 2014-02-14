@@ -11,7 +11,7 @@ BigInt randomPrime(BigInt size); //Generates a prime number with 'size' digits
 BigInt* euclideanAlgorithm(BigInt a, BigInt b); //Outputs a 3 element array with elements (d,x,y) such that gcd(a,b) = ax+by and y>0
 BigInt* modInverse(BigInt e, BigInt p, BigInt q); //Outputs a 2 element array with elements (d,n) such that ed=1%(p-1)(q-1), n=pq
 void rsaEncrypt(BigInt e, BigInt n, string message); //Outputs the RSA Encrypted message
-string rsaDecrypt(BigInt d, BigInt n, string eMessage); //Decrypts and outputs the encrypted message
+void rsaDecrypt(BigInt d, BigInt n, string eMessage); //Decrypts and outputs the encrypted message
 
 BigInt generateRandom(BigInt size); //Generates a random number of the given size
 BigInt bigPow(BigInt a, BigInt b); //Calculates a^b
@@ -72,8 +72,9 @@ int main(int argc, char *argv[])
             BigInt n = atoi(argv[3]);
             string message = argv[4];
             cout << "d = " << d << ", n = " << n <<", message = \""<< message << "\"" << endl;
-            string decrypted = rsaDecrypt(d, n, message);
-            cout << "The decrypted message is: " << decrypted << endl;
+            cout << "The decrypted message is: ";
+            rsaDecrypt(d, n, message);
+            cout << endl;
         }
     }
     
@@ -288,7 +289,7 @@ string decToBin(BigInt number)
         return decToBin(number / 2) + "1";
 }
 
-string rsaDecrypt(BigInt d, BigInt n, string eMessage)
+void rsaDecrypt(BigInt d, BigInt n, string eMessage)
 {
     stringstream toBeSeparated(eMessage);
     string word;
@@ -330,8 +331,10 @@ string rsaDecrypt(BigInt d, BigInt n, string eMessage)
         }
     }
     
-    //convert ASCII to string
-    
-    return "meh";
+    for(int i = 0; i < count; i++)
+    {
+        cout << ascii[i][0] << ascii[i][1] << ascii[i][2] << ascii[i][3] << ascii[i][4] << ascii[i][5] << ascii[i][6] << ascii[i][7] << " "
+            << ascii[i][8] << ascii[i][9] << ascii[i][10] << ascii[i][11] << ascii[i][12] << ascii[i][13] << ascii[i][14] << ascii[i][15] << " ";
+    }
 }
 
