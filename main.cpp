@@ -21,6 +21,7 @@ string* stringToAscii(string message); //Converts a string to an array of number
 string* asciiBlocks(string* asciiMessage, int& length);
 BigInt* asciiToDecimal(string* asciiMessage, int length);
 string decToBin(BigInt number);
+int byteToDecimal(string binary);
 
 int main(int argc, char *argv[])
 {
@@ -296,6 +297,7 @@ void rsaDecrypt(BigInt d, BigInt n, string eMessage)
     string* separated = new string[0];
     int count = 0;
     string* old;
+    string result = "";
     
     while(getline(toBeSeparated, word, ' '))
     {
@@ -336,10 +338,45 @@ void rsaDecrypt(BigInt d, BigInt n, string eMessage)
         }
     }
     
+    string* individualBinaryAscii = new string[count * 2];
+    int finalIndex = 0;
+    char* temp = new char[8];
     for(int i = 0; i < count; i++)
     {
-        cout << ascii[i][0] << ascii[i][1] << ascii[i][2] << ascii[i][3] << ascii[i][4] << ascii[i][5] << ascii[i][6] << ascii[i][7] << " "
-            << ascii[i][8] << ascii[i][9] << ascii[i][10] << ascii[i][11] << ascii[i][12] << ascii[i][13] << ascii[i][14] << ascii[i][15] << " ";
+        for(int x = 0; x < 8; x++)
+        {
+            temp[x] = ascii[i][x];
+        }  
+        individualBinaryAscii[finalIndex] = temp;
+        finalIndex++;
+        
+        for(int x = 0; x < 8; x++)
+        {
+            temp[x] = ascii[i][x + 8];
+        }  
+        individualBinaryAscii[finalIndex] = temp;
+        finalIndex++;
+    }  
+    
+    /*if(individualBinaryAscii[finalIndex - 2] == "00000000")
+    {
+        individualBinaryAscii[finalIndex - 2] = individualBinaryAscii[finalIndex - 1];
+        individualBinaryAscii[finalIndex - 1] = "";
+    }*/
+    
+    for(int i = 0; i < finalIndex; i++)
+    {
+        char temp = byteToDecimal(individualBinaryAscii[i]);
+        cout << temp;
     }
+}
+
+int byteToDecimal(string binary)
+{
+    int decimal = 0;
+    
+    decimal = (int) bitset<8>(binary).to_ulong();
+    
+    return decimal;
 }
 
