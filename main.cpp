@@ -38,9 +38,11 @@ int main(int argc, char *argv[])
         cout << "Your prime number is: " << randomPrime(size) << endl;
     }
     else if(argc == 3)
-    {
-        BigInt a = atoi(argv[1]);
-        BigInt b = atoi(argv[2]);
+    {   
+        string temp = argv[1];
+        BigInt a = temp;
+        temp = argv[2];
+        BigInt b = temp;
         cout << "a = " << a << ", b = " << b << endl;
         BigInt* euclidean = euclideanAlgorithm(a,b);
         cout << "x = " << euclidean[1] << ", y = " << euclidean[2] << endl;
@@ -48,9 +50,12 @@ int main(int argc, char *argv[])
     }
     else if(argc == 4)
     {
-        BigInt e = atoi(argv[1]);
-        BigInt p = atoi(argv[2]);
-        BigInt q = atoi(argv[3]);
+        string temp = argv[1];
+        BigInt e = temp;
+        temp = argv[2];
+        BigInt p = temp;
+        temp = argv[3];
+        BigInt q = temp;
         cout << "e = " << e << ", p = " << p <<", q = "<< q << endl;
         BigInt* mods = modInverse(e, p, q);
         cout << "d = " << mods[0] << ", n = " << mods[1] << endl;
@@ -59,8 +64,10 @@ int main(int argc, char *argv[])
     {
         if(argv[1][0] == 'e')
         {
-            BigInt e = atoi(argv[2]);
-            BigInt n = atoi(argv[3]);
+            string temp = argv[2];
+            BigInt e = temp;
+            temp = argv[3];
+            BigInt n = temp;
             string message = argv[4];
             cout << "e = " << e << ", n = " << n <<", message = \""<< message << "\"" << endl;
             cout << "The encrypted message is: ";
@@ -69,8 +76,10 @@ int main(int argc, char *argv[])
         }
         else if(argv[1][0]=='d')
         {
-            BigInt d = atoi(argv[2]);
-            BigInt n = atoi(argv[3]);
+            string temp = argv[2];
+            BigInt d = temp;
+            temp = argv[3];
+            BigInt n = temp;
             string message = argv[4];
             cout << "d = " << d << ", n = " << n <<", message = \""<< message << "\"" << endl;
             cout << "The decrypted message is: ";
@@ -357,12 +366,6 @@ void rsaDecrypt(BigInt d, BigInt n, string eMessage)
         individualBinaryAscii[finalIndex] = temp;
         finalIndex++;
     }  
-    
-    /*if(individualBinaryAscii[finalIndex - 2] == "00000000")
-    {
-        individualBinaryAscii[finalIndex - 2] = individualBinaryAscii[finalIndex - 1];
-        individualBinaryAscii[finalIndex - 1] = "";
-    }*/
     
     for(int i = 0; i < finalIndex; i++)
     {
