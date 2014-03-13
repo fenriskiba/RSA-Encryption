@@ -33,12 +33,14 @@ int main(int argc, char *argv[])
     }
     else if(argc == 2)
     {
+    	//Output a prime number of the input number of digits
         BigInt size = atoi(argv[1]);
         cout << "Size of your prime number: " << size << endl;
         cout << "Your prime number is: " << randomPrime(size) << endl;
     }
     else if(argc == 3)
     {   
+    	//Output (x,y) such that gcd(a,b) = ax+by and y>0
         string temp = argv[1];
         BigInt a = temp;
         temp = argv[2];
@@ -50,6 +52,7 @@ int main(int argc, char *argv[])
     }
     else if(argc == 4)
     {
+    	//Output (d,n) such that ed=1%(p-1)(q-1), n=pq
         string temp = argv[1];
         BigInt e = temp;
         temp = argv[2];
@@ -62,8 +65,9 @@ int main(int argc, char *argv[])
     }
     else if(argc == 5)
     {
-        if(argv[1][0] == 'e')
+        if(argv[1][0] == 'e') //If using the "-e" command
         {
+            //Encrypt the input message using (e,n) as the public key
             string temp = argv[2];
             BigInt e = temp;
             temp = argv[3];
@@ -74,8 +78,9 @@ int main(int argc, char *argv[])
             rsaEncrypt(e, n, message);
             cout << endl;
         }
-        else if(argv[1][0]=='d')
+        else if(argv[1][0]=='d') //If using the -d command
         {
+            //Decrypt the input message using (d,n) as the secret key
             string temp = argv[2];
             BigInt d = temp;
             temp = argv[3];
@@ -91,6 +96,9 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+/*-----------------------------------------------------------------------------------------------*/
+
+//Main Functions used in output
 BigInt randomPrime(BigInt size)
 {
 	BigInt possiblePrime = generateRandom(size);
@@ -101,6 +109,140 @@ BigInt randomPrime(BigInt size)
 	return possiblePrime;
 }
 
+BigInt* euclideanAlgorithm(BigInt a, BigInt b)
+{
+    BigInt* result = new BigInt[3];
+    BigInt* resultPrime;
+    
+    if(b == 0)
+    {
+        result[0] = a;
+        result[1] = 1;
+        result[2] = 0;
+        return result;
+    }
+    
+    resultPrime = euclideanAlgorithm(b, a % b);
+    
+    result[0] = resultPrime[0];
+    result[1] = resultPrime[2];
+    result[2] = resultPrime[1] - ((a / b) * resultPrime[2]);
+    
+    delete [] resultPrime;
+    
+    return result;
+}
+
+BigInt* modInverse(BigInt e, BigInt p, BigInt q)
+{
+    BigInt n = p * q;
+    BigInt m = (p - 1) * (q - 1);
+    BigInt* dTemp = euclideanAlgorithm(e,m);
+    BigInt d = (dTemp[1] + m) % m;
+    
+    BigInt* result = new BigInt[2];
+    result[0] = d;
+    result[1] = n;
+    
+    return result;
+}
+
+void rsaEncrypt(BigInt e, BigInt n, string message)
+{
+    string* asciiMessage = stringToAscii(message);
+    int numOfBlocks = message.length();
+    
+    string* combinedBlocks = asciiBlocks(asciiMessage, numOfBlocks);
+    delete [] asciiMessage;
+    
+    BigInt* toBeEncrypted = asciiToDecimal(combinedBlocks, numOfBlocks);
+    delete [] combinedBlocks;
+    
+    
+    for(int i = 0; i < numOfBlocks; i++)
+    {
+        cout << modularExponentiation(toBeEncrypted[i], e, n) << " ";
+    }
+}
+
+void rsaDecrypt(BigInt d, BigInt n, string eMessage)
+{
+    stringstream toBeSeparated(eMessage);
+    string word;
+    string* separated = new string[0];
+    int count = 0;
+    string* old;
+    string result = "";
+    
+    while(getline(toBeSeparated, word, ' '))
+    {
+        count++;
+        old = separated;
+        
+        separated = new string[count];
+        
+        for(int i = 0; i < count-1; i++)
+        {
+            separated[i] = old[i];
+        }
+        if(count != 1)
+            delete [] old;
+        
+        separated[count-1] = word;
+    }
+    
+    
+    BigInt* decrypted = new BigInt[count];
+    for(int i = 0; i < count; i++)
+    {
+        decrypted[i] = separated[i];
+        decrypted[i] = modularExponentiation(decrypted[i], d, n);
+    }
+    delete [] separated;
+    
+    string* ascii = new string[count];
+    for(int i = 0; i < count; i++)
+    {
+        ascii[i] = decToBin(decrypted[i]);
+        if(ascii[i].length() < 16)
+        {   
+            string temp = "";
+            for(int x = 0; x < (16 - ascii[i].length()); x++)
+                temp += "0";
+            ascii[i] = temp + ascii[i];
+        }
+    }
+    
+    string* individualBinaryAscii = new string[count * 2];
+    int finalIndex = 0;
+    char* temp = new char[8];
+    for(int i = 0; i < count; i++)
+    {
+        for(int x = 0; x < 8; x++)
+        {
+            temp[x] = ascii[i][x];
+        }  
+        individualBinaryAscii[finalIndex] = temp;
+        finalIndex++;
+        
+        for(int x = 0; x < 8; x++)
+        {
+            temp[x] = ascii[i][x + 8];
+        }  
+        individualBinaryAscii[finalIndex] = temp;
+        finalIndex++;
+    }  
+    
+    for(int i = 0; i < finalIndex; i++)
+    {
+        char temp = byteToDecimal(individualBinaryAscii[i]);
+        cout << temp;
+    }
+}
+
+/*---------------------------------------------------------------------------------*/
+
+//Secondary Logic Functions
 BigInt generateRandom(BigInt size)
 {
     BigInt result = 0;
@@ -179,62 +321,6 @@ bool fermatsLittleTheorem(BigInt possiblePrime)
     return true;
 }
 
-BigInt* euclideanAlgorithm(BigInt a, BigInt b)
-{
-    BigInt* result = new BigInt[3];
-    BigInt* resultPrime;
-    
-    if(b == 0)
-    {
-        result[0] = a;
-        result[1] = 1;
-        result[2] = 0;
-        return result;
-    }
-    
-    resultPrime = euclideanAlgorithm(b, a % b);
-    
-    result[0] = resultPrime[0];
-    result[1] = resultPrime[2];
-    result[2] = resultPrime[1] - ((a / b) * resultPrime[2]);
-    
-    delete [] resultPrime;
-    
-    return result;
-}
-
-BigInt* modInverse(BigInt e, BigInt p, BigInt q)
-{
-    BigInt n = p * q;
-    BigInt m = (p - 1) * (q - 1);
-    BigInt* dTemp = euclideanAlgorithm(e,m);
-    BigInt d = (dTemp[1] + m) % m;
-    
-    BigInt* result = new BigInt[2];
-    result[0] = d;
-    result[1] = n;
-    
-    return result;
-}
-
-void rsaEncrypt(BigInt e, BigInt n, string message)
-{
-    string* asciiMessage = stringToAscii(message);
-    int numOfBlocks = message.length();
-    
-    string* combinedBlocks = asciiBlocks(asciiMessage, numOfBlocks);
-    delete [] asciiMessage;
-    
-    BigInt* toBeEncrypted = asciiToDecimal(combinedBlocks, numOfBlocks);
-    delete [] combinedBlocks;
-    
-    
-    for(int i = 0; i < numOfBlocks; i++)
-    {
-        cout << modularExponentiation(toBeEncrypted[i], e, n) << " ";
-    }
-}
-
 string* stringToAscii(string message)
 {
     string* result = new string[message.length()];
@@ -298,82 +384,6 @@ string decToBin(BigInt number)
     else
         return decToBin(number / 2) + "1";
 }
-
-void rsaDecrypt(BigInt d, BigInt n, string eMessage)
-{
-    stringstream toBeSeparated(eMessage);
-    string word;
-    string* separated = new string[0];
-    int count = 0;
-    string* old;
-    string result = "";
-    
-    while(getline(toBeSeparated, word, ' '))
-    {
-        count++;
-        old = separated;
-        
-        separated = new string[count];
-        
-        for(int i = 0; i < count-1; i++)
-        {
-            separated[i] = old[i];
-        }
-        if(count != 1)
-            delete [] old;
-        
-        separated[count-1] = word;
-    }
-    
-    
-    BigInt* decrypted = new BigInt[count];
-    for(int i = 0; i < count; i++)
-    {
-        decrypted[i] = separated[i];
-        decrypted[i] = modularExponentiation(decrypted[i], d, n);
-    }
-    delete [] separated;
-    
-    string* ascii = new string[count];
-    for(int i = 0; i < count; i++)
-    {
-        ascii[i] = decToBin(decrypted[i]);
-        if(ascii[i].length() < 16)
-        {   
-            string temp = "";
-            for(int x = 0; x < (16 - ascii[i].length()); x++)
-                temp += "0";
-            ascii[i] = temp + ascii[i];
-        }
-    }
-    
-    string* individualBinaryAscii = new string[count * 2];
-    int finalIndex = 0;
-    char* temp = new char[8];
-    for(int i = 0; i < count; i++)
-    {
-        for(int x = 0; x < 8; x++)
-        {
-            temp[x] = ascii[i][x];
-        }  
-        individualBinaryAscii[finalIndex] = temp;
-        finalIndex++;
-        
-        for(int x = 0; x < 8; x++)
-        {
-            temp[x] = ascii[i][x + 8];
-        }  
-        individualBinaryAscii[finalIndex] = temp;
-        finalIndex++;
-    }  
-    
-    for(int i = 0; i < finalIndex; i++)
-    {
-        char temp = byteToDecimal(individualBinaryAscii[i]);
-        cout << temp;
-    }
-}
-
 int byteToDecimal(string binary)
 {
     int decimal = 0;
