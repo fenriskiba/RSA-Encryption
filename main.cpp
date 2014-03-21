@@ -9,19 +9,19 @@ using namespace std;
 
 BigInt randomPrime(BigInt size); //Generates a prime number with 'size' digits
 BigInt* euclideanAlgorithm(BigInt a, BigInt b); //Outputs a 3 element array with elements (d,x,y) such that gcd(a,b) = ax+by and y>0
-BigInt* modInverse(BigInt e, BigInt p, BigInt q); //Outputs a 2 element array with elements (d,n) such that ed=1%(p-1)(q-1), n=pq
+BigInt* modularInverse(BigInt e, BigInt p, BigInt q); //Outputs a 2 element array with elements (d,n) such that ed=1%(p-1)(q-1), n=pq
 void rsaEncrypt(BigInt e, BigInt n, string message); //Outputs the RSA Encrypted message
 void rsaDecrypt(BigInt d, BigInt n, string eMessage); //Decrypts and outputs the encrypted message
 
-BigInt generateRandom(BigInt size); //Generates a random number of the given size
-BigInt bigPow(BigInt a, BigInt b); //Calculates a^b
+BigInt generateRandomPrime(BigInt size); //Generates a random number of the given size
+BigInt powForBigInts(BigInt a, BigInt b); //Calculates a^b
 BigInt modularExponentiation(BigInt base, BigInt exp, BigInt mod); //Calculates a^b mod x
-bool fermatsLittleTheorem(BigInt possiblePrime);
-string* stringToAscii(string message); //Converts a string to an array of numbers representing the ascii values
-string* asciiBlocks(string* asciiMessage, int& length);
-BigInt* asciiToDecimal(string* asciiMessage, int length);
-string decToBin(BigInt number);
-int byteToDecimal(string binary);
+bool isPrime(BigInt possiblePrime); //Tests for primality using Fermat's Little Theorem
+string* stringToAsciiBinary(string message); //Converts a string to an array of numbers representing the ascii values
+string* condenseAsciiBinary(string* asciiMessage, int& length);
+BigInt* asciiBinaryToBigInt(string* asciiMessage, int length);
+string decimalToBinary(BigInt number);
+int asciiBinaryToDecimal(string binary);
 
 int main(int argc, char *argv[])
 {
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
         temp = argv[3];
         BigInt q = temp;
         cout << "e = " << e << ", p = " << p <<", q = "<< q << endl;
-        BigInt* mods = modInverse(e, p, q);
+        BigInt* mods = modularInverse(e, p, q);
         cout << "d = " << mods[0] << ", n = " << mods[1] << endl;
     }
     else if(argc == 5)
@@ -101,10 +101,10 @@ int main(int argc, char *argv[])
 //Main Functions used in output
 BigInt randomPrime(BigInt size)
 {
-	BigInt possiblePrime = generateRandom(size);
+	BigInt possiblePrime = generateRandomPrime(size);
     
-    while(!fermatsLittleTheorem(possiblePrime))
-        possiblePrime = generateRandom(size);
+    while(!isPrime(possiblePrime))
+        possiblePrime = generateRandomPrime(size);
 
 	return possiblePrime;
 }
@@ -133,7 +133,7 @@ BigInt* euclideanAlgorithm(BigInt a, BigInt b)
     return result;
 }
 
-BigInt* modInverse(BigInt e, BigInt p, BigInt q)
+BigInt* modularInverse(BigInt e, BigInt p, BigInt q)
 {
     BigInt n = p * q;
     BigInt m = (p - 1) * (q - 1);
@@ -149,13 +149,13 @@ BigInt* modInverse(BigInt e, BigInt p, BigInt q)
 
 void rsaEncrypt(BigInt e, BigInt n, string message)
 {
-    string* asciiMessage = stringToAscii(message);
+    string* asciiMessage = stringToAsciiBinary(message);
     int numOfBlocks = message.length();
     
-    string* combinedBlocks = asciiBlocks(asciiMessage, numOfBlocks);
+    string* combinedBlocks = condenseAsciiBinary(asciiMessage, numOfBlocks);
     delete [] asciiMessage;
     
-    BigInt* toBeEncrypted = asciiToDecimal(combinedBlocks, numOfBlocks);
+    BigInt* toBeEncrypted = asciiBinaryToBigInt(combinedBlocks, numOfBlocks);
     delete [] combinedBlocks;
     
     
@@ -203,7 +203,7 @@ void rsaDecrypt(BigInt d, BigInt n, string eMessage)
     string* ascii = new string[count];
     for(int i = 0; i < count; i++)
     {
-        ascii[i] = decToBin(decrypted[i]);
+        ascii[i] = decimalToBinary(decrypted[i]);
         if(ascii[i].length() < 16)
         {   
             string temp = "";
@@ -235,7 +235,7 @@ void rsaDecrypt(BigInt d, BigInt n, string eMessage)
     
     for(int i = 0; i < finalIndex; i++)
     {
-        char temp = byteToDecimal(individualBinaryAscii[i]);
+        char temp = asciiBinaryToDecimal(individualBinaryAscii[i]);
         cout << temp;
     }
 }
@@ -243,7 +243,7 @@ void rsaDecrypt(BigInt d, BigInt n, string eMessage)
 /*---------------------------------------------------------------------------------*/
 
 //Secondary Logic Functions
-BigInt generateRandom(BigInt size)
+BigInt generateRandomPrime(BigInt size)
 {
     BigInt result = 0;
     BigInt digit;
@@ -251,17 +251,17 @@ BigInt generateRandom(BigInt size)
     for(BigInt i = 0; i < size - 1; i = i + 1)
     {
         digit = rand();
-        result = result + (digit % 10) * bigPow(10, i);
+        result = result + (digit % 10) * powForBigInts(10, i);
     }
     
     digit = rand();
     
-    result = result + ((digit % 9) + 1) * bigPow(10, size - 1);
+    result = result + ((digit % 9) + 1) * powForBigInts(10, size - 1);
     
     return result;
 }
 
-BigInt bigPow(BigInt base, BigInt exponent)
+BigInt powForBigInts(BigInt base, BigInt exponent)
 {
     if (exponent == 0) 
     {
@@ -273,12 +273,12 @@ BigInt bigPow(BigInt base, BigInt exponent)
     }
     else if (exponent % 2 == 0)
     {
-        BigInt t = bigPow(base, exponent / 2);
+        BigInt t = powForBigInts(base, exponent / 2);
         return t * t;
     }
     else
     {
-        BigInt t = bigPow(base, exponent / 2);
+        BigInt t = powForBigInts(base, exponent / 2);
         return t * t * base;
     }
 }
@@ -304,7 +304,7 @@ BigInt modularExponentiation(BigInt base, BigInt exp, BigInt mod)
     }
 }
 
-bool fermatsLittleTheorem(BigInt possiblePrime)
+bool isPrime(BigInt possiblePrime)
 {
     BigInt random;
     int a = 2; //Increase this number to improve reliability
@@ -321,7 +321,7 @@ bool fermatsLittleTheorem(BigInt possiblePrime)
     return true;
 }
 
-string* stringToAscii(string message)
+string* stringToAsciiBinary(string message)
 {
     string* result = new string[message.length()];
     
@@ -335,7 +335,7 @@ string* stringToAscii(string message)
     return result;
 }
 
-string* asciiBlocks(string* asciiMessage, int& length)
+string* condenseAsciiBinary(string* asciiMessage, int& length)
 {
     bool isEven = length % 2 ? false : true;
     int newLength = (isEven ? length / 2 : (length / 2) + 1);
@@ -358,7 +358,7 @@ string* asciiBlocks(string* asciiMessage, int& length)
     return result;
 }
 
-BigInt* asciiToDecimal(string* binary, int length)
+BigInt* asciiBinaryToBigInt(string* binary, int length)
 {
     unsigned long decimal = 0;
     BigInt* result = new BigInt[length];
@@ -372,7 +372,7 @@ BigInt* asciiToDecimal(string* binary, int length)
     return result;
 }
 
-string decToBin(BigInt number)
+string decimalToBinary(BigInt number)
 {
     if(number == 0) 
         return "0";
@@ -380,11 +380,11 @@ string decToBin(BigInt number)
         return "1";
 
     if(number % 2 == 0)
-        return decToBin(number / 2) + "0";
+        return decimalToBinary(number / 2) + "0";
     else
-        return decToBin(number / 2) + "1";
+        return decimalToBinary(number / 2) + "1";
 }
-int byteToDecimal(string binary)
+int asciiBinaryToDecimal(string binary)
 {
     int decimal = 0;
     

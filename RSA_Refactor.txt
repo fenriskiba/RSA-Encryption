@@ -1,6 +1,6 @@
 Steps to Refactor RSA Project: 
 1. *Complete* Move all helper functions to bottom. 
-2. Rename all existing functions to be more descriptive 
+2. *Complete* Rename all existing functions to be more descriptive 
 3. Pull out extra functions 
 4. (Optional) Find way to refactor main() to look nicer
 5. (Optional) Tag current master as v1.0 and final refactored version as v1.5
